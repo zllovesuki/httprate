@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/go-chi/httprate"
+	"kon.nect.sh/httprate"
 )
 
 func TestLimit(t *testing.T) {

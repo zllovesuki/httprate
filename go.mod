@@ -1,4 +1,4 @@
-module github.com/go-chi/httprate
+module kon.nect.sh/httprate
 
 go 1.17
 
