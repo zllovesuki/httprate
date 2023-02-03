@@ -1,27 +1,17 @@
 package httprate
 
 import (
+	"crypto/sha1"
 	"encoding/binary"
 	"fmt"
-	"hash"
 	"math"
 	"net/http"
 	"sync"
 	"time"
-
-	"github.com/orisano/wyhash"
 )
 
 const (
 	hashSeed uint64 = 0x42
-)
-
-var (
-	hasherPool = sync.Pool{
-		New: func() interface{} {
-			return wyhash.New(hashSeed)
-		},
-	}
 )
 
 type LimitCounter interface {
@@ -215,13 +205,11 @@ func (c *localCounter) evict() {
 func LimitCounterKey(key string, window time.Time) uint64 {
 	var (
 		b [8]byte
-		h = hasherPool.Get().(hash.Hash64)
+		h = sha1.New()
 	)
-	h.Reset()
 	binary.LittleEndian.PutUint64(b[:], uint64(window.Unix()))
 	h.Write([]byte(key))
 	h.Write(b[:])
-	n := h.Sum64()
-	hasherPool.Put(h)
-	return n
+	sum := h.Sum(nil)
+	return binary.LittleEndian.Uint64(sum[:8])
 }
